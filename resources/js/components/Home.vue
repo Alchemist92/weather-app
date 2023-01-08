@@ -66,18 +66,17 @@ const cityName = ref("");
 const submitRequest  = () => {
     cityName.value = city.value;
     axios.get(`/api/city/${city.value}`)
-    .then(({data: {data}}) => {        
-        weather.value = data;
-    })
-    .catch(({ response: { data } }) => {        
-      if(data){
-        errorMessage.value = `Unable to fetch weather infomation for ${city.value}` ;
-        setTimeout(() => {
-            errorMessage.value = "";
-            city.value = "";
-        }, 4000)
-      }
-    });
+    .then(({data}) => { 
+        if(data.status === "success"){
+            return weather.value = data.data;
+        } else{
+            errorMessage.value = data.message ;
+            return setTimeout(() => {
+                errorMessage.value = "";
+                city.value = "";
+            }, 4000)
+        }                                  
+    })    
 };
 const capitalize = (word) => {
     return word[0].toUpperCase() + word.slice(1);
