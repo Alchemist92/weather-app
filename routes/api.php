@@ -15,5 +15,3 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/city/{city}', [CityController::class, 'getWeather'])
-    ->name('city-weather');

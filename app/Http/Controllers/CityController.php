@@ -5,24 +5,43 @@ namespace App\Http\Controllers;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Response;
+use SimpleXMLElement;
 
 class CityController extends Controller
 {
-    public function getWeather(string $city): JsonResponse
+    public function getWeather(string $city)
     {              
         $client = new Client();
 
         try{
-            $res = $client->get('http://api.openweathermap.org/data/2.5/weather?q='.$city.'&appid='.env('WEATHER_API'));
-            if ($res->getStatusCode() == 200) { 
-                $response_data =json_decode( $res->getBody()->getContents());
+            $res = Http::get('http://api.openweathermap.org/data/2.5/weather?q='.$city.'&appid='.env('VITE_WEATHER_API_KEY'));
+            if ($res->getStatusCode() == 200) {                 
+                
+                $data = json_decode($res, true);
 
-                return Response::json([
-                    'status' => "success",
-                    'data' => $response_data->weather[0]->description,
-                    'message' => 'Weather fetched successfully',
-                ]);
+               
+                function artoxml($arr, $i=1,$flag=false){
+                    $sp = "";
+                    for($j=0;$j<=$i;$j++){
+                        $sp.="";
+                     }
+                    foreach($arr as $key=>$val){
+                        echo "$sp&lt;".$key."&gt;";
+                        if($i==1) echo "\n";
+                        if(is_array($val)){
+                            if(!$flag){echo"\n";}
+                            artoxml($val,$i+5);
+                            echo "$sp&lt;/".$key."&gt;\n";
+                        }else{
+                              echo "$val"."&lt;/".$key."&gt;\n";
+                         }
+                    }
+                
+                }
+                
+                artoxml(array($data), 1);
             }              
         } catch(Exception $e){
             if($e){
